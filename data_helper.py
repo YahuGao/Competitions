@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import sys
 import jieba
-
+from flyai.dataset import Dataset
 
 def data_clean(sent):
     """
@@ -57,6 +57,21 @@ def remove_stop_words(text):
 
     return ''.join(new_text)
 
+class FlyAIDataSet(Dataset):
+    def __init__(self, inputs, labels):
+        self.inputs = inputs
+        self.labels = labels
+
+        def to_categorical(y, num_classes):
+            return np.eye(num_classes, dtype='uint8')[y]
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, index):
+        inputs = self.inputs[index]
+        label = self.labels[index]
+        return inputs, label
 ''
 if __name__ == "__main__":
     text = '#深圳禁摩限电# 自行车、汽车也同样会引发交通事故——为何单怪他们？（我早就发现：交通的混乱，反映了“交管局”内部的混乱！）必须先严整公安交管局内部！——抓问题的根本！@深圳交警@中国政府网@人民日报'
