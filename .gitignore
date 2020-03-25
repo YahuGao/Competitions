@@ -1,0 +1,10 @@
+.idea/
+venv/
+__pycache__/
+build/
+data/
+.flyai_darwin
+.flyai_linux
+errors.log
+pytorch_template.zip
+tags
