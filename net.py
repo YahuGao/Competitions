@@ -4,13 +4,13 @@ from torch import nn
 
 
 class Net(nn.Module):
-    def __init__(self, input_size,
-                 hidden_size,
-                 num_layers,
-                 drop_prob,
-                 batch_first,
-                 bidirectional,
-                 output_size):
+    def __init__(self, input_size=300,
+                 hidden_size=128,
+                 num_layers=2,
+                 drop_prob=0.5,
+                 batch_first=True,
+                 bidirectional=False,
+                 output_size=3):
         super(Net, self).__init__()
 
         self.num_layers = num_layers
