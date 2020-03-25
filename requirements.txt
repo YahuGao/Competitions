@@ -1,0 +1,8 @@
+flyai
+numpy
+opencv-python
+matplotlib
+scipy
+Pillow==6.2.2
+torch==1.2.0
+torchvision==0.4.0
