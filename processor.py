@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 
-import numpy
+import numpy as np
 from flyai.processor.base import Base
 
 '''
@@ -15,8 +15,8 @@ class Processor(Base):
     该方法字段与app.yaml中的input:->columns:对应
     '''
 
-    def input_x(self, image_path):
-        return image_path
+    def input_x(self, TARGET, TEXT):
+        pass
 
     '''
     参数为csv中作为输入y的一条数据，该方法会被dataset.next_train_batch()
@@ -24,8 +24,13 @@ class Processor(Base):
     该方法字段与app.yaml中的output:->columns:对应
     '''
 
-    def input_y(self, label):
-        return label
+    def input_y(self, STANCE):
+        if STANCE == 'NONE':
+            return np.array([1, 0, 0])
+        elif STANCE == 'FAVOR':
+            return np.array([0, 1, 0])
+        elif STANCE == 'AGAINST':
+            return np.array([0, 0, 1])
 
     '''
     参数为csv中作为输入x的一条数据，该方法会被dataset.next_train_batch()
@@ -33,12 +38,12 @@ class Processor(Base):
     该方法字段与app.yaml中的input:->columns:对应
     '''
 
-    def output_x(self, image_path):
-        return image_path
+    def output_x(self, TARGET, TEXT):
+        return TARGET, TEXT
 
     '''
     输出的结果，会被dataset.to_categorys(data)调用
     '''
 
     def output_y(self, data):
-        return numpy.argmax(data)
+        return np.argmax(data)

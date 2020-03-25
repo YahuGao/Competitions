@@ -42,10 +42,10 @@ model:
   # 在processor.py的input_x方法中体现
   input:
     columns:
-      - name:
-        type:
-      - name:
-        type:
+      - name: TARGET
+        type: string
+      - name: TEXT
+        type: string
     # 最终转换的数据类型
     to_type: float
     # 最终转换的数据维度
@@ -54,14 +54,12 @@ model:
   # 在processor.py的input_y方法中体现
   output:
     columns:
-      - name:
-        type:
-      - name:
-        type:
+      - name: STANCE
+        type: string
     # 最终转换的数据类型
-    to_type: float
+    to_type: numpy.ndarray
     # 最终转换的数据维度
-    to_shape: [?,?....]
+    to_shape: (3,)
 
 # 使用离线训练的服务器
 servers:
