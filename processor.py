@@ -2,6 +2,8 @@
 
 import numpy as np
 from flyai.processor.base import Base
+from transformation import PreTrainedEmbedding
+import data_helper
 
 '''
 把样例项目中的processor.py件复制过来替换即可
@@ -9,6 +11,7 @@ from flyai.processor.base import Base
 
 
 class Processor(Base):
+    preTrainedEmbedding = PreTrainedEmbedding()
     '''
     参数为csv中作为输入x的一条数据，该方法会被dataset.next_train_batch()
     和dataset.next_validation_batch()多次调用。可在该方法中做数据增强
@@ -16,7 +19,9 @@ class Processor(Base):
     '''
 
     def input_x(self, TARGET, TEXT):
-        pass
+        text = data_helper.data_clean(TEXT)
+        text2vec = self.preTrainedEmbedding.turnToVectors(text)
+        return text2vec
 
     '''
     参数为csv中作为输入y的一条数据，该方法会被dataset.next_train_batch()
