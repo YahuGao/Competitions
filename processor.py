@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 
 import numpy as np
+import torch
 from flyai.processor.base import Base
 from transformation import PreTrainedEmbedding
 import data_helper
@@ -44,11 +45,14 @@ class Processor(Base):
     '''
 
     def output_x(self, TARGET, TEXT):
-        return TARGET, TEXT
+        text2vec = self.input_x(TARGET, TEXT)
+        return text2vec
 
     '''
     输出的结果，会被dataset.to_categorys(data)调用
     '''
 
     def output_y(self, data):
-        return np.argmax(data)
+        labels = ['None', 'FAVOR', 'AGAINST']
+        index = np.argmax(data)
+        return labels[index]
