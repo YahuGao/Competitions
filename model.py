@@ -27,6 +27,13 @@ class Model(Base):
 
         x_data = self.data.predict_data(**data)
         x_data = torch.from_numpy(x_data)
+
+        if torch.cuda.is_available():
+            device = 'cuda'
+        else:
+            device = 'cpu'
+
+        x_data = x_data.to(device)
         outputs = self.net(x_data)
         prediction = outputs.data.numpy()
         prediction = self.data.to_categorys(prediction)
@@ -35,13 +42,20 @@ class Model(Base):
     def predict_all(self, datas):
         if self.net is None:
             self.net = torch.load(self.net_path)
-        datas = torch.Tensor(datas)
-        outputs = self.net(datas)
-        predictions = outputs.data.numpy()
         labels = []
-        for prediction in predictions:
-            label = self.data.to_categorys(prediction)
-            labels.append(label)
+        if torch.cuda.is_available():
+            device = 'cuda'
+        else:
+            device = 'cpu'
+
+        for data in datas:
+            x_data = self.data.predict_data(**data)
+            x_data = torch.from_numpy(x_data)
+            x_data = x_data.to(device)
+            outputs = self.net(x_data)
+            prediction = outputs.data.numpy()
+            prediction = self.data.to_categorys(prediction)
+            labels.append(prediction)
         return labels
 
     def batch_iter(self, x, y, batch_size=128):
