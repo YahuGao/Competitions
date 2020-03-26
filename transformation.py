@@ -31,7 +31,7 @@ class PreTrainedEmbedding(Singleton):
         wordVecURL = 'https://www.flyai.com/m/sgns.weibo.word.bz2'
         path = remote_helper.get_remote_data(wordVecURL)
         print("path is: ", path)
-        with bz2.open(path, "r") as f:
+        with open('./data/input/model/sgns', 'r') as f:
             for line in tqdm(f):
                 line = line.strip()
                 if not line:
