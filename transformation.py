@@ -2,6 +2,8 @@
 from tqdm import tqdm
 import numpy as np
 import jieba
+import bz2
+from flyai.utils import remote_helper
 
 
 class Transformation:
@@ -26,8 +28,10 @@ class Singleton(object):
 class PreTrainedEmbedding(Singleton):
     embeddings = {}
     def __init__(self, preTrained_file='sgns.weibo.bigram-char'):
-
-        with open(preTrained_file) as f:
+        wordVecURL = 'https://www.flyai.com/m/sgns.weibo.word.bz2'
+        path = remote_helper.get_remote_data(wordVecURL)
+        print("path is: ", path)
+        with bz2.open(path, "r") as f:
             for line in tqdm(f):
                 line = line.strip()
                 if not line:
