@@ -73,8 +73,7 @@ lr = 0.0005
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(net.parameters(), lr=lr)
 clip = 5
-counter = 0
-print_every = 10
+print_every = 1000
 valid_loss_min = np.Inf
 
 train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
@@ -92,8 +91,10 @@ dataset.get_step() 获取数据的总迭代次数
 
 for i in range(args.EPOCHS):
     best_score = 0
+    counter = 0
     h = net.init_hidden(args.BATCH, device)
     for inputs, labels in train_loader:
+        counter += 1
         h = tuple([e.data for e in h])
         inputs, labels = inputs.to(device), labels.to(device)
         net.zero_grad()
