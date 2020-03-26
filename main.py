@@ -73,7 +73,7 @@ lr = 0.0005
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(net.parameters(), lr=lr)
 clip = 5
-print_every = 1000
+print_every = 10
 valid_loss_min = np.Inf
 
 train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
