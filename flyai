@@ -9,8 +9,8 @@ esac
 
 
 if [ $machine = "Mac" ]; then
-    chmod +x ./.flyai_darwin
-	./.flyai_darwin "$@"
+    chmod +x ./darwin
+	./darwin "$@"
 fi
 
 if [ $machine = "Linux" ]; then
