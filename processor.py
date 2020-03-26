@@ -49,6 +49,8 @@ class PreTrainedEmbedding(Singleton):
             vector = self.embeddings.get('。')
             for i in range(length - len(words)):
                 vectors.append(vector)
+        else:
+            vectors = vectors[:100]
 
         vectors = np.array(vectors)
         return vectors
