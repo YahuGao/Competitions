@@ -5,7 +5,6 @@ import torch
 from flyai.processor.base import Base
 import data_helper
 import jieba
-from tqdm import tqdm
 from flyai.utils import remote_helper
 
 class Singleton(object):
@@ -23,7 +22,7 @@ class PreTrainedEmbedding(Singleton):
         path = remote_helper.get_remote_data(wordVecURL)
         print("path is: ", path)
         with open('./data/input/model/sgns', 'r') as f:
-            for line in tqdm(f):
+            for line in f:
                 line = line.strip()
                 if not line:
                     continue
