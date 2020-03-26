@@ -10,7 +10,7 @@ description: 该task目的是自动确定微博文本的作者是否赞成给定
 algorithm: LSTM
 language: python3
 # 项目使用的框架
-framework: pytorch
+framework: PyTorch
 
 # 使用的数据集
 data:
@@ -49,7 +49,7 @@ model:
     # 最终转换的数据类型
     to_type: float
     # 最终转换的数据维度
-    to_shape: [?,?,....]
+    to_shape:
   # 模型用到的输入y字段
   # 在processor.py的input_y方法中体现
   output:
@@ -59,7 +59,7 @@ model:
     # 最终转换的数据类型
     to_type: numpy.ndarray
     # 最终转换的数据维度
-    to_shape: (3,)
+    to_shape:
 
 # 使用离线训练的服务器
 servers:
