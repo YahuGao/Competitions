@@ -82,4 +82,16 @@ if __name__ == '__main__':
     model = Model(dataset)
     x_vals, y_vals = dataset.evaluate_data_no_processor()
     labels = model.predict_all(x_vals)
+    Y_vals = []
+    for label in y_vals:
+        if label['STANCE'] == 'NONE':
+            Y_vals.append(0)
+        elif label['STANCE'] == 'FAVOR':
+            Y_vals.append(1)
+        else:
+            Y_vals.append(2)
+
+    print(Y_vals)
     print(labels)
+    from sklearn.metrics import f1_score
+    print("f1_score: ", f1_score(Y_vals, labels, average='macro'))
