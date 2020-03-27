@@ -57,7 +57,7 @@ model:
       - name: STANCE
         type: string
     # 最终转换的数据类型
-    to_type: numpy.ndarray
+    to_type:
     # 最终转换的数据维度
     to_shape:
 
