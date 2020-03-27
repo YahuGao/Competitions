@@ -35,7 +35,7 @@ class Model(Base):
 
         x_data = x_data.to(device)
         outputs = self.net(x_data)
-        prediction = outputs.data.numpy()
+        prediction = outputs.data.cpu().numpy()
         prediction = self.data.to_categorys(prediction)
         return prediction
 
@@ -53,7 +53,7 @@ class Model(Base):
             x_data = torch.from_numpy(x_data)
             x_data = x_data.to(device)
             outputs = self.net(x_data)
-            prediction = outputs.data.numpy()
+            prediction = outputs.data.cpu().numpy()
             prediction = self.data.to_categorys(prediction)
             labels.append(prediction)
         return labels
