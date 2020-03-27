@@ -80,6 +80,6 @@ class Model(Base):
 if __name__ == '__main__':
     dataset = Dataset(10, 32)
     model = Model(dataset)
-    x_vals, y_vals = dataset.next_validation_batch()
+    x_vals, y_vals = dataset.evaluate_data_no_processor()
     labels = model.predict_all(x_vals)
     print(labels)
