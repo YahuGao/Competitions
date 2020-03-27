@@ -102,6 +102,5 @@ class Processor(Base):
     '''
 
     def output_y(self, data):
-        labels = ['None', 'FAVOR', 'AGAINST']
         index = np.argmax(data)
-        return labels[index]
+        return index
