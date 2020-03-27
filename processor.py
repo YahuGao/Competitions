@@ -81,11 +81,11 @@ class Processor(Base):
 
     def input_y(self, STANCE):
         if STANCE == 'NONE':
-            return np.array([1, 0, 0])
+            return 0
         elif STANCE == 'FAVOR':
-            return np.array([0, 1, 0])
+            return 1
         elif STANCE == 'AGAINST':
-            return np.array([0, 0, 1])
+            return 2
 
     '''
     参数为csv中作为输入x的一条数据，该方法会被dataset.next_train_batch()
