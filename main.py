@@ -39,6 +39,36 @@ flyai库中的提供的数据处理方法
 dataset = Dataset(epochs=args.EPOCHS, batch=args.BATCH)
 model = Model(dataset)
 
+train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
+train_dataset = FlyAIDataSet(train_x, train_y)
+val_dataset = FlyAIDataSet(val_x, val_y)
+train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True,
+                                           batch_size=args.BATCH)
+val_loader = torch.utils.data.DataLoader(val_dataset, shuffle=True,
+                                         batch_size=args.BATCH)
+
+# ---------统计训练数据的类别
+count_train_F = 0
+count_train_A = 0
+count_train_N = 0
+
+for y in train_y:
+    if y == 1:
+        count_train_F += 1
+    elif y == 2:
+        count_train_A += 1
+    else:
+        count_train_N += 1
+# --------- 打印
+print('FAVOR_rate:{}, AGAINST_rate:{},NONE_rate:{}'.format(
+    count_train_F / len(train_y),
+    count_train_A / len(train_y),
+    count_train_N / len(train_y)))
+
+weight = torch.Tensor([count_train_N / len(train_y),
+                       count_train_F / len(train_y),
+                       count_train_A / len(train_y)])
+
 '''
 实现自己的网络机构
 '''
@@ -70,19 +100,11 @@ net = Net(input_size,
           output_size).to(device)
 
 lr = 0.0005
-criterion = torch.nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss(weight=weight)
 optimizer = torch.optim.Adam(net.parameters(), lr=lr)
 clip = 5
 print_every = 10
 valid_loss_min = np.Inf
-
-train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
-train_dataset = FlyAIDataSet(train_x, train_y)
-val_dataset = FlyAIDataSet(val_x, val_y)
-train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True,
-                                           batch_size=args.BATCH)
-val_loader = torch.utils.data.DataLoader(val_dataset, shuffle=True,
-                                         batch_size=args.BATCH)
 
 '''
 dataset.get_step() 获取数据的总迭代次数
@@ -99,7 +121,7 @@ for i in range(args.EPOCHS):
         inputs, labels = inputs.to(device), labels.to(device)
         net.zero_grad()
         out = net(inputs)
-        loss = criterion(out, torch.max(labels, 1)[1])
+        loss = criterion(out, labels)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
         optimizer.step()
@@ -111,7 +133,7 @@ for i in range(args.EPOCHS):
             for inp, lab in val_loader:
                 inp, lab = inp.to(device), lab.to(device)
                 out = net(inp)
-                val_loss = criterion(out, torch.max(lab, 1)[1])
+                val_loss = criterion(out, lab)
                 val_losses.append(val_loss.item())
 
             net.train()
