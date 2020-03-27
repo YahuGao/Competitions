@@ -114,10 +114,8 @@ dataset.get_step() 获取数据的总迭代次数
 for i in range(args.EPOCHS):
     best_score = 0
     counter = 0
-    h = net.init_hidden(args.BATCH, device)
     for inputs, labels in train_loader:
         counter += 1
-        h = tuple([e.data for e in h])
         inputs, labels = inputs.to(device), labels.to(device)
         net.zero_grad()
         out = net(inputs)
@@ -127,7 +125,6 @@ for i in range(args.EPOCHS):
         optimizer.step()
 
         if counter % print_every == 0:
-            val_h = net.init_hidden(args.BATCH, device)
             val_losses = []
             net.eval()
             for inp, lab in val_loader:
