@@ -67,9 +67,9 @@ print('FAVOR_rate:{}, AGAINST_rate:{},NONE_rate:{}'.format(
     count_train_A / len(train_y),
     count_train_N / len(train_y)))
 
-weight = torch.Tensor([count_train_N / len(train_y),
-                       count_train_F / len(train_y),
-                       count_train_A / len(train_y)])
+MAX_NUM = max([count_train_N, count_train_F, count_train_A])
+weight = torch.Tensor([MAX_NUM / count_train_N, MAX_NUM / count_train_F,
+                       MAX_NUM / count_train_A])
 
 '''
 实现自己的网络机构
@@ -79,7 +79,9 @@ if torch.cuda.is_available():
     device = 'cuda'
 else:
     device = 'cpu'
+
 device = torch.device(device)
+weight.to(device)
 
 input_size = 300
 hidden_size = 128
