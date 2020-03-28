@@ -13,6 +13,8 @@ from net import Net
 import numpy as np
 from path import MODEL_PATH
 from data_helper import FlyAIDataSet
+from flyai.utils.log_helper import train_log
+from sklearn.metrics import accuracy_score
 
 '''
 样例代码仅供参考学习，可以自己修改实现逻辑。
@@ -121,6 +123,9 @@ for i in range(args.EPOCHS):
         net.zero_grad()
         out = net(inputs)
         loss = criterion(out, labels)
+        out = out.cpu()
+        train_acc = accuracy_score(labels.data.cpu().numpy(),
+                                   torch.max(out, -1)[1])
         loss.backward()
         torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
         optimizer.step()
@@ -133,6 +138,12 @@ for i in range(args.EPOCHS):
                 out = net(inp)
                 val_loss = criterion(out, lab)
                 val_losses.append(val_loss.item())
+                out = out.cpu()
+                val_acc = accuracy_score(lab.data.cpu().numpy(),
+                                         torch.max(out, -1)[1])
+
+            train_log(train_loss=loss, train_acc=train_acc,
+                      val_loss=val_loss, val_acc=val_acc)
 
             net.train()
             print("Epoch: {}/{}...".format(i+1, args.EPOCHS),
