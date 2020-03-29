@@ -104,8 +104,8 @@ net = Net(input_size,
           output_size).to(device)
 
 lr = 0.0005
-# criterion = torch.nn.CrossEntropyLoss(weight=weight)
-criterion = torch.nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss(weight=weight)
+# criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(net.parameters(), lr=lr)
 clip = 5
 print_every = 5
