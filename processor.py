@@ -20,8 +20,7 @@ class PreTrainedEmbedding(Singleton):
     def __init__(self, preTrained_file='sgns.weibo.bigram-char'):
         wordVecURL = 'https://www.flyai.com/m/sgns.weibo.word.bz2'
         path = remote_helper.get_remote_data(wordVecURL)
-        print("path is: ", path)
-        with open('./data/input/model/sgns', 'r') as f:
+        with open('./data/input/model/sgns.weibo.bigram-char', 'r') as f:
             for line in f:
                 line = line.strip()
                 if not line:
@@ -41,10 +40,7 @@ class PreTrainedEmbedding(Singleton):
             if word not in self.embeddings.keys():
                 count += 1
 
-        # print("%d words not found in %d words %.2f" % (count, len(words),
-        #                                              count/len(words)))
         if len(words) < length:
-            # print("padding %d vectors" % (length - len(words)))
             vector = self.embeddings.get('。')
             for i in range(length - len(words)):
                 vectors.append(vector)
@@ -52,6 +48,8 @@ class PreTrainedEmbedding(Singleton):
             vectors = vectors[:100]
 
         vectors = np.array(vectors)
+        if __name__ == '__main__':
+            return vectors, count/len(words)
         return vectors
 
 
@@ -104,3 +102,17 @@ class Processor(Base):
     def output_y(self, data):
         index = np.argmax(data)
         return index
+
+
+if __name__ == '__main__':
+    from flyai.dataset import Dataset
+    dataset = Dataset(10, 32)
+    train_x, train_y, val_x, val_y = dataset.get_all_data()
+    preTrainedEmbedding = PreTrainedEmbedding()
+    contents = [x['TEXT'] for x in train_x]
+    unfounds = []
+    for words in contents:
+        print(words)
+        vector, unfound = preTrainedEmbedding.turnToVectors(words)
+        unfounds.append(unfound)
+    print("unfound probability is: %f", np.mean(unfounds))
