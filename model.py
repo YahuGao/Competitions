@@ -94,4 +94,4 @@ if __name__ == '__main__':
     print(Y_vals)
     print(labels)
     from sklearn.metrics import f1_score
-    print("f1_score: ", f1_score(Y_vals, labels, average='macro'))
+    print("f1_score: ", f1_score(Y_vals, labels, average='macro', labels=[0,1,2]))
