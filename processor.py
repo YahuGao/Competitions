@@ -20,7 +20,7 @@ class PreTrainedEmbedding(Singleton):
     def __init__(self, preTrained_file='sgns.weibo.bigram-char'):
         wordVecURL = 'https://www.flyai.com/m/sgns.weibo.word.bz2'
         path = remote_helper.get_remote_data(wordVecURL)
-        with open('./data/input/model/sgns.weibo.bigram-char', 'r') as f:
+        with open('./data/input/model/sgns', 'r') as f:
             for line in f:
                 line = line.strip()
                 if not line:
