@@ -103,12 +103,13 @@ net = Net(input_size,
           bidirectional,
           output_size).to(device)
 
-lr = 0.0005
+lrs = [0.0005, 0.0004, 0.0003, 0.0002, 0.0001]
 best_lr = 0
 criterion = torch.nn.CrossEntropyLoss(weight=weight)
 # criterion = torch.nn.CrossEntropyLoss()
-clip = 5
-print_every = 5
+clips = [5, 3, 1, 0.5, 0.3, 0.1]
+best_clip = 0
+print_every = 10
 valid_loss_min = np.Inf
 
 '''
@@ -116,51 +117,56 @@ dataset.get_step() 获取数据的总迭代次数
 实现自己的模型保存逻辑
 '''
 
-for lr in [0.0005, 0.0004, 0.0003, 0.0002, 0.0001]:
-    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
-    for i in range(args.EPOCHS):
-        best_score = 0
-        counter = 0
-        for inputs, labels in train_loader:
-            counter += 1
-            inputs, labels = inputs.to(device), labels.to(device)
-            net.zero_grad()
-            out = net(inputs)
-            loss = criterion(out, labels)
-            out = out.cpu()
-            train_acc = accuracy_score(labels.data.cpu().numpy(),
-                                       torch.max(out, -1)[1])
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
-            optimizer.step()
+for lr in lrs:
+    for clip in clips:
+        optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+        for i in range(args.EPOCHS):
+            best_score = 0
+            counter = 0
+            for inputs, labels in train_loader:
+                counter += 1
+                inputs, labels = inputs.to(device), labels.to(device)
+                net.zero_grad()
+                out = net(inputs)
+                loss = criterion(out, labels)
+                loss_data = loss.cpu().data.numpy()
+                out = out.cpu()
+                train_acc = accuracy_score(labels.data.cpu().numpy(),
+                                           torch.max(out, -1)[1])
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
+                optimizer.step()
 
-            if counter % print_every == 0:
-                val_losses = []
-                net.eval()
-                for inp, lab in val_loader:
-                    inp, lab = inp.to(device), lab.to(device)
-                    out = net(inp)
-                    val_loss = criterion(out, lab)
-                    val_losses.append(val_loss.item())
-                    out = out.cpu()
-                    val_acc = accuracy_score(lab.data.cpu().numpy(),
-                                             torch.max(out, -1)[1])
+                if counter % print_every == 0:
+                    val_losses = []
+                    net.eval()
+                    for inp, lab in val_loader:
+                        inp, lab = inp.to(device), lab.to(device)
+                        out = net(inp)
+                        val_loss = criterion(out, lab)
+                        val_loss_data = val_loss.cpu().data.numpy()
+                        val_losses.append(val_loss.item())
+                        out = out.cpu()
+                        val_acc = accuracy_score(lab.data.cpu().numpy(),
+                                                 torch.max(out, -1)[1])
 
-                train_log(train_loss=loss, train_acc=train_acc,
-                          val_loss=val_loss, val_acc=val_acc)
+                    train_log(train_loss=loss, train_acc=train_acc,
+                              val_loss=val_loss, val_acc=val_acc)
 
-                net.train()
-                print("Epoch: {}/{}...".format(i+1, args.EPOCHS),
-                      "Step: {}...".format(counter),
-                      "Loss: {:.6f}...".format(loss.item()),
-                      "Val Loss: {:.6f}".format(np.mean(val_losses)))
-                if np.mean(val_losses) <= valid_loss_min:
-                    model.save_model(net, MODEL_PATH, overwrite=True)
-                    print('Validation loss decreased({: .6f} --> {: .6f}). \
-                          Saving model ...'.format(
-                          valid_loss_min, np.mean(val_losses)))
-                    best_lr = lr
-                    valid_loss_min = np.mean(val_losses)
+                    net.train()
+                    print("Epoch: {}/{}...".format(i+1, args.EPOCHS),
+                          "Step: {}...".format(counter),
+                          "Loss: {:.6f}...".format(loss.item()),
+                          "Val Loss: {:.6f}".format(np.mean(val_losses)))
+                    if np.mean(val_losses) <= valid_loss_min:
+                        model.save_model(net, MODEL_PATH, overwrite=True)
+                        print('Validation loss decreased({: .6f} --> {: .6f}). \
+                              Saving model ...'.format(
+                              valid_loss_min, np.mean(val_losses)))
+                        best_lr = lr
+                        best_clip = clip
+                        valid_loss_min = np.mean(val_losses)
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", lr)
+print("best_clip: ", lr)
