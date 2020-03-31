@@ -120,6 +120,7 @@ dataset.get_step() 获取数据的总迭代次数
 for lr in lrs:
     for clip in clips:
         optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+        pre_valid_loss_min = 1000
         for i in range(args.EPOCHS):
             best_score = 0
             counter = 0
@@ -166,6 +167,12 @@ for lr in lrs:
                         best_lr = lr
                         best_clip = clip
                         valid_loss_min = np.mean(val_losses)
+
+            if pre_valid_loss_min > valid_loss_min:
+                pre_valid_loss_min = valid_loss_min
+            else:
+                print("early stop")
+                break
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", lr)
