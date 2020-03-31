@@ -175,5 +175,5 @@ for lr in lrs:
                 break
 
 model.save_model(net, MODEL_PATH, overwrite=False)
-print("best_lr: ", lr)
-print("best_clip: ", lr)
+print("best_lr: ", best_lr)
+print("best_clip: ", best_clip)
