@@ -25,7 +25,7 @@ class Net(nn.Module):
 
     def forward(self, input):
         out, _ = self.LSTM(input)
-        # out = self.dropout(out)
+        out = self.dropout(out)
         out = self.fc(out)
         out = out[:, -1]
         out = self.softmax(out)
