@@ -107,8 +107,10 @@ lrs = [0.0005, 0.0004, 0.0003, 0.0002, 0.0001]
 best_lr = 0
 criterion = torch.nn.CrossEntropyLoss(weight=weight)
 # criterion = torch.nn.CrossEntropyLoss()
-clips = [5, 3, 1, 0.5, 0.3, 0.1]
+clips = [0.1]
+weight_decays = [5, 3, 1, 0.5, 0.3, 0.1]
 best_clip = 0
+best_weight_decay = 0
 print_every = 10
 valid_loss_min = np.Inf
 
@@ -119,61 +121,64 @@ dataset.get_step() 获取数据的总迭代次数
 
 for lr in lrs:
     for clip in clips:
-        optimizer = torch.optim.Adam(net.parameters(), lr=lr)
-        pre_valid_loss_min = 1000
-        for i in range(args.EPOCHS):
-            best_score = 0
-            counter = 0
-            for inputs, labels in train_loader:
-                counter += 1
-                inputs, labels = inputs.to(device), labels.to(device)
-                net.zero_grad()
-                out = net(inputs)
-                loss = criterion(out, labels)
-                loss_data = loss.cpu().data.numpy()
-                out = out.cpu()
-                train_acc = accuracy_score(labels.data.cpu().numpy(),
-                                           torch.max(out, -1)[1])
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
-                optimizer.step()
+        for weight_decay in weight_decays:
+            optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+            pre_valid_loss_min = 1000
+            for i in range(args.EPOCHS):
+                best_score = 0
+                counter = 0
+                for inputs, labels in train_loader:
+                    counter += 1
+                    inputs, labels = inputs.to(device), labels.to(device)
+                    net.zero_grad()
+                    out = net(inputs)
+                    loss = criterion(out, labels)
+                    loss_data = loss.cpu().data.numpy()
+                    out = out.cpu()
+                    train_acc = accuracy_score(labels.data.cpu().numpy(),
+                                               torch.max(out, -1)[1])
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
+                    optimizer.step()
 
-                if counter % print_every == 0:
-                    val_losses = []
-                    net.eval()
-                    for inp, lab in val_loader:
-                        inp, lab = inp.to(device), lab.to(device)
-                        out = net(inp)
-                        val_loss = criterion(out, lab)
-                        val_loss_data = val_loss.cpu().data.numpy()
-                        val_losses.append(val_loss.item())
-                        out = out.cpu()
-                        val_acc = accuracy_score(lab.data.cpu().numpy(),
-                                                 torch.max(out, -1)[1])
+                    if counter % print_every == 0:
+                        val_losses = []
+                        net.eval()
+                        for inp, lab in val_loader:
+                            inp, lab = inp.to(device), lab.to(device)
+                            out = net(inp)
+                            val_loss = criterion(out, lab)
+                            val_loss_data = val_loss.cpu().data.numpy()
+                            val_losses.append(val_loss.item())
+                            out = out.cpu()
+                            val_acc = accuracy_score(lab.data.cpu().numpy(),
+                                                     torch.max(out, -1)[1])
 
-                    train_log(train_loss=loss, train_acc=train_acc,
-                              val_loss=val_loss, val_acc=val_acc)
+                        train_log(train_loss=loss, train_acc=train_acc,
+                                  val_loss=val_loss, val_acc=val_acc)
 
-                    net.train()
-                    print("Epoch: {}/{}...".format(i+1, args.EPOCHS),
-                          "Step: {}...".format(counter),
-                          "Loss: {:.6f}...".format(loss.item()),
-                          "Val Loss: {:.6f}".format(np.mean(val_losses)))
-                    if np.mean(val_losses) <= valid_loss_min:
-                        model.save_model(net, MODEL_PATH, overwrite=True)
-                        print('Validation loss decreased({: .6f} --> {: .6f}). \
-                              Saving model ...'.format(
-                              valid_loss_min, np.mean(val_losses)))
-                        best_lr = lr
-                        best_clip = clip
-                        valid_loss_min = np.mean(val_losses)
+                        net.train()
+                        print("Epoch: {}/{}...".format(i+1, args.EPOCHS),
+                              "Step: {}...".format(counter),
+                              "Loss: {:.6f}...".format(loss.item()),
+                              "Val Loss: {:.6f}".format(np.mean(val_losses)))
+                        if np.mean(val_losses) <= valid_loss_min:
+                            model.save_model(net, MODEL_PATH, overwrite=True)
+                            print('Validation loss decreased({: .6f} --> {: .6f}). \
+                                  Saving model ...'.format(
+                                  valid_loss_min, np.mean(val_losses)))
+                            best_lr = lr
+                            best_clip = clip
+                            best_weight_decay = weight_decay
+                            valid_loss_min = np.mean(val_losses)
 
-            if pre_valid_loss_min > valid_loss_min:
-                pre_valid_loss_min = valid_loss_min
-            else:
-                print("early stop")
-                break
+                if pre_valid_loss_min > valid_loss_min:
+                    pre_valid_loss_min = valid_loss_min
+                else:
+                    print("early stop")
+                    break
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", best_lr)
 print("best_clip: ", best_clip)
+print("best_weight_decay: ", best_weight_decay)
