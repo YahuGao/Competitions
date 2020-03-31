@@ -7,6 +7,7 @@ import data_helper
 import jieba
 from flyai.utils import remote_helper
 
+
 class Singleton(object):
     def __new__(cls, *args, **kw):
         if not hasattr(cls, '_instance'):
@@ -43,7 +44,7 @@ class PreTrainedEmbedding(Singleton):
         if len(words) < length:
             vector = self.embeddings.get('。')
             for i in range(length - len(words)):
-                vectors.append(vector)
+                vectors.insert(0, vector)
         else:
             vectors = vectors[:100]
 
