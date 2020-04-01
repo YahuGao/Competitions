@@ -20,13 +20,11 @@ class Net(nn.Module):
                             batch_first=batch_first,
                             dropout=drop_prob)
         self.fc = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, input):
         out, _ = self.LSTM(input)
         out = self.fc(out)
         out = out[:, -1]
-        out = self.softmax(out)
         return out
 
     def init_hidden(self, batch_size, device='cpu'):
