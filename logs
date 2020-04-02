@@ -45,3 +45,8 @@ torch.nn.utils.rnn.pad_packed_sequence()
 
 10. weight_decays = [0.1, 0.05, 0.03, 0.01]  训练的到的分数为22.5
 训练损失较大，训练精度和验证精度均没有明显变化均为0.4左右
+
+11. 去除优化器的正则化后，在线评估的分数增加到了49，正则化果然有问题
+
+12. 在等待结果的过程中发现，pytorch的cross entropy loss 是对softmax，log
+和NLLloss的合并，因此删除网络中的softmax层，并本地测试了一把，没有问题
