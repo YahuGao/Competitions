@@ -108,7 +108,7 @@ best_lr = 0
 criterion = torch.nn.CrossEntropyLoss(weight=weight)
 # criterion = torch.nn.CrossEntropyLoss()
 clips = [0.1]
-weight_decays = [5, 3, 1, 0.5, 0.3, 0.1]
+weight_decays = [0.01]
 best_clip = 0
 best_weight_decay = 0
 print_every = 10
@@ -122,7 +122,8 @@ dataset.get_step() 获取数据的总迭代次数
 for lr in lrs:
     for clip in clips:
         for weight_decay in weight_decays:
-            optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+            # optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+            optimizer = torch.optim.Adam(net.parameters(), lr=lr)
             pre_valid_loss_min = 1000
             for i in range(args.EPOCHS):
                 best_score = 0
@@ -138,7 +139,7 @@ for lr in lrs:
                     train_acc = accuracy_score(labels.data.cpu().numpy(),
                                                torch.max(out, -1)[1])
                     loss.backward()
-                    torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
+                    # torch.nn.utils.clip_grad_norm_(net.parameters(), clip)
                     optimizer.step()
 
                     if counter % print_every == 0:
