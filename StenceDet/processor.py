@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*
 
 import numpy as np
-import torch
 from flyai.processor.base import Base
 import data_helper
 import jieba
