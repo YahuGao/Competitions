@@ -49,10 +49,10 @@ val_dataset = FlyAIDataSet(val_x, val_y)
 def collate_fn(data):
     data.sort(key=lambda x:len(x[0]), reverse=True)
     inputs, labels = zip(*data)
-    inputs_len = [len(item) for item in inputs]
-    inputs = [torch.Tensor(x) for x in inputs]
+    inputs_len = [len(item) for item in inputs if len(item) != 0]
+    inputs = [torch.Tensor(x) for x in inputs[:len(inputs_len)]]
     inputs = rnn_utils.pad_sequence(inputs, batch_first=True)
-    labels = torch.LongTensor(labels)
+    labels = torch.LongTensor(labels[:len(inputs_len)])
     return inputs, inputs_len, labels
 
 train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True,
