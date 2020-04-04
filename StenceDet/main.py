@@ -15,6 +15,7 @@ from path import MODEL_PATH
 from data_helper import FlyAIDataSet
 from flyai.utils.log_helper import train_log
 from sklearn.metrics import accuracy_score
+import torch.nn.utils.rnn as rnn_utils
 
 '''
 样例代码仅供参考学习，可以自己修改实现逻辑。
@@ -44,10 +45,22 @@ model = Model(dataset)
 train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
 train_dataset = FlyAIDataSet(train_x, train_y)
 val_dataset = FlyAIDataSet(val_x, val_y)
+
+def collate_fn(data):
+    data.sort(key=lambda x:len(x[0]), reverse=True)
+    inputs, labels = zip(*data)
+    inputs_len = [len(item) for item in inputs]
+    inputs = [torch.Tensor(x) for x in inputs]
+    inputs = rnn_utils.pad_sequence(inputs, batch_first=True)
+    labels = torch.LongTensor(labels)
+    return inputs, inputs_len, labels
+
 train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True,
-                                           batch_size=args.BATCH)
+                                           batch_size=args.BATCH,
+                                           collate_fn=collate_fn)
 val_loader = torch.utils.data.DataLoader(val_dataset, shuffle=True,
-                                         batch_size=args.BATCH)
+                                         batch_size=args.BATCH,
+                                         collate_fn=collate_fn)
 
 # ---------统计训练数据的类别
 count_train_F = 0
@@ -128,8 +141,11 @@ for lr in lrs:
             for i in range(args.EPOCHS):
                 best_score = 0
                 counter = 0
-                for inputs, labels in train_loader:
+                for inputs, inputs_len, labels in train_loader:
                     counter += 1
+                    inputs = rnn_utils.pack_padded_sequence(inputs,
+                                                            inputs_len,
+                                                            batch_first=True)
                     inputs, labels = inputs.to(device), labels.to(device)
                     net.zero_grad()
                     out = net(inputs)
@@ -145,7 +161,10 @@ for lr in lrs:
                     if counter % print_every == 0:
                         val_losses = []
                         net.eval()
-                        for inp, lab in val_loader:
+                        for inp, inp_len, lab in val_loader:
+                            inp = rnn_utils.pack_padded_sequence(inp,
+                                                                 inp_len,
+                                                                 batch_first=True)
                             inp, lab = inp.to(device), lab.to(device)
                             out = net(inp)
                             val_loss = criterion(out, lab)

@@ -40,13 +40,6 @@ class PreTrainedEmbedding(Singleton):
             if word not in self.embeddings.keys():
                 count += 1
 
-        if len(words) < length:
-            vector = self.embeddings.get('。')
-            for i in range(length - len(words)):
-                vectors.insert(0, vector)
-        else:
-            vectors = vectors[:100]
-
         vectors = np.array(vectors)
         if __name__ == '__main__':
             return vectors, count/len(words)

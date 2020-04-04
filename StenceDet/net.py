@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*
 import torch
 from torch import nn
+import torch.nn.utils.rnn as rnn_utils
 
 
 class Net(nn.Module):
@@ -23,6 +24,8 @@ class Net(nn.Module):
 
     def forward(self, input):
         out, _ = self.LSTM(input)
+        out_pad, out_pad_len = rnn_utils.pad_packed_sequence(out, batch_first=True)
+        out = out_pad[:, out_pad_len - 1, :]
         out = self.fc(out)
         out = out[:, -1]
         return out

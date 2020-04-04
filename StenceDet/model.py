@@ -5,6 +5,7 @@ import torch
 from flyai.model.base import Base
 from flyai.dataset import Dataset
 from net import Net
+import torch.nn.utils.rnn as rnn_utils
 
 from path import MODEL_PATH
 
@@ -33,6 +34,10 @@ class Model(Base):
         else:
             device = 'cpu'
 
+        x_data = rnn_utils.pad_sequence(x_data, batch_first=True)
+        x_data = rnn_utils.pack_padded_sequence(x_data,
+                                                [len(x_data[0])],
+                                                batch_first=True)
         x_data = x_data.to(device)
         outputs = self.net(x_data)
         prediction = outputs.data.cpu().numpy()
@@ -51,6 +56,10 @@ class Model(Base):
         for data in datas:
             x_data = self.data.predict_data(**data)
             x_data = torch.from_numpy(x_data)
+            x_data = rnn_utils.pad_sequence(x_data, batch_first=True)
+            x_data = rnn_utils.pack_padded_sequence(x_data,
+                                                    [len(x_data[0])],
+                                                    batch_first=True)
             x_data = x_data.to(device)
             outputs = self.net(x_data)
             prediction = outputs.data.cpu().numpy()
