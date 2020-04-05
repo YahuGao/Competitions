@@ -25,7 +25,7 @@ def data_clean(sent):
 
 def regular(text):
     # 去除(# #)字段
-    text = re.sub(r'#.*#',' ',text)
+    # text = re.sub(r'#.*#',' ',text)
     # 去除多个@用户
     # unicode 编码中，中文范围为4e00-9fa5
     text = re.sub(r'@([\u4e00-\u9fa5a-zA-Z0-9_-]+)',' ',text)
