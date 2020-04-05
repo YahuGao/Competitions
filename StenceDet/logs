@@ -50,3 +50,16 @@ torch.nn.utils.rnn.pad_packed_sequence()
 
 12. 在等待结果的过程中发现，pytorch的cross entropy loss 是对softmax，log
 和NLLloss的合并，因此删除网络中的softmax层，并本地测试了一把，没有问题
+
+13. 着手在训练和测试过程中使用边长序列，借助pad_sequence, pack_padded_sequence
+和pad_packed_sequence三个函数。
+避免了训练过程中的Tensor.size([0])的问题后在测试过程中出现了如下问题
+...
+[200~labels = model.predict_all(x_test)
+File "model.py", line 62, in predict_all
+batch_first=True)
+File "/usr/local/lib/python3.6/dist-packages/torch/nn/utils/rnn.py", line 233, in pack_padded_sequence
+_VF._pack_padded_sequence(input, lengths, batch_first)
+RuntimeError: Cannot pack empty tensors.
+train finish
+...
