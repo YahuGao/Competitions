@@ -63,3 +63,5 @@ _VF._pack_padded_sequence(input, lengths, batch_first)
 RuntimeError: Cannot pack empty tensors.
 train finish
 ...
+
+14. 使用变长序列之后，在线训练得分为53.9
