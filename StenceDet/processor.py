@@ -60,7 +60,6 @@ class Processor(Base):
     '''
 
     def input_x(self, TARGET, TEXT):
-        text = TARGET + TEXT
         text = data_helper.data_clean(TEXT)
         text2vec = self.preTrainedEmbedding.turnToVectors(text)
         return text2vec

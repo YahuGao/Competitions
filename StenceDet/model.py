@@ -56,6 +56,9 @@ class Model(Base):
         for data in datas:
             x_data = self.data.predict_data(**data)
             x_data = torch.from_numpy(x_data)
+            if torch.numel(x_data) == 0:
+                labels.append(0)
+                continue
             x_data = rnn_utils.pad_sequence(x_data, batch_first=True)
             x_data = rnn_utils.pack_padded_sequence(x_data,
                                                     [len(x_data[0])],
