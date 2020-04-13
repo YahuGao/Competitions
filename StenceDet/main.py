@@ -99,7 +99,7 @@ device = torch.device(device)
 input_size = 300
 hidden_size = 128
 num_layers = 2
-drop_prob = 0.5
+drop_prob = 0
 output_size = 3
 bidirectional = False
 batch_first = True
@@ -121,7 +121,7 @@ best_lr = 0
 criterion = torch.nn.CrossEntropyLoss(weight=weight)
 # criterion = torch.nn.CrossEntropyLoss()
 clips = [0.1]
-weight_decays = [0.01]
+weight_decays = [0.000001, 0.0000005, 0.0000001, 0.00000005, 0.00000001]
 best_clip = 0
 best_weight_decay = 0
 print_every = 10
@@ -132,11 +132,24 @@ dataset.get_step() 获取数据的总迭代次数
 实现自己的模型保存逻辑
 '''
 
+def get_weights_and_bias(model):
+    weights, bias = [], []
+    for name, p in model.named_parameters():
+        if 'bias' in name:
+            bias += [p]
+        else:
+            weights += [p]
+    return weights, bias
+
 for lr in lrs:
     for clip in clips:
         for weight_decay in weight_decays:
-            # optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
-            optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+            weights, bias = get_weights_and_bias(net)
+            optimizer = torch.optim.Adam([
+                {'params': weights},
+                {'params': bias, weight_decay: 0}],
+                lr=lr, weight_decay=weight_decay)
+            # optimizer = torch.optim.Adam(net.parameters(), lr=lr)
             pre_valid_loss_min = 1000
             for i in range(args.EPOCHS):
                 best_score = 0
@@ -192,13 +205,13 @@ for lr in lrs:
                             best_weight_decay = weight_decay
                             valid_loss_min = np.mean(val_losses)
 
-                '''
+                # '''
                 if pre_valid_loss_min > valid_loss_min:
                     pre_valid_loss_min = valid_loss_min
                 else:
                     print("early stop")
                     break
-                '''
+                # '''
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", best_lr)
