@@ -11,6 +11,8 @@ import pandas as pd
 import sys
 import jieba
 from flyai.dataset import Dataset
+import string
+import unicodedata
 
 def data_clean(sent):
     """
@@ -32,13 +34,18 @@ def regular(text):
     # 去除url
     text = re.sub(r'http[s]?://[a-zA-Z0-9.?/&=:]*', ' ', text)
     # 去除英文和数字
-    # text = re.sub(r'[a-zA-Z0-9]', ' ', text)
+    text = re.sub(r'[a-zA-Z0-9]', ' ', text)
     # 去除其他噪音字符
-    text = re.sub(r'[—|（）()【】…「~_]+', ' ', text)
+    text = re.sub(r'[—|（）()【】…「~_、”“]+', '', text)
     # 去除多余空格
     text = re.sub(r'\s+', ' ', text)
     # 去除首行空格
     text = text.strip()
+    text = unicodedata.normalize('NFKC', text)
+    for word in text:
+        for i in string.punctuation:
+            if word == i:
+                text = text.replace(i, '')
 
     return text
 
@@ -50,6 +57,7 @@ def remove_stop_words(text):
         for line in file.readlines():
             stop_words.append(line.strip())
     word_segment = jieba.lcut(text)
+    print(word_segment)
 
     for word in word_segment:
         if word not in stop_words:
