@@ -99,7 +99,7 @@ device = torch.device(device)
 input_size = 300
 hidden_size = 128
 num_layers = 2
-drop_prob = 0
+drop_prob = 0.3
 output_size = 3
 bidirectional = False
 batch_first = True
@@ -205,13 +205,11 @@ for lr in lrs:
                             best_weight_decay = weight_decay
                             valid_loss_min = np.mean(val_losses)
 
-                # '''
                 if pre_valid_loss_min > valid_loss_min:
                     pre_valid_loss_min = valid_loss_min
                 else:
                     print("early stop")
                     break
-                # '''
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", best_lr)

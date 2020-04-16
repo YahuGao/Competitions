@@ -21,11 +21,13 @@ class Net(nn.Module):
                             batch_first=batch_first,
                             dropout=drop_prob)
         self.fc = nn.Linear(hidden_size, output_size)
+        self.dropout = nn.Dropout(drop_prob)
 
     def forward(self, input):
         out, _ = self.LSTM(input)
         out_pad, out_pad_len = rnn_utils.pad_packed_sequence(out, batch_first=True)
         out = out_pad[:, out_pad_len - 1, :]
+        out = self.dropout(out)
         out = self.fc(out)
         out = out[:, -1]
         return out
