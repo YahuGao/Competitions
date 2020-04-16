@@ -4,7 +4,7 @@ from torch import nn
 import torch.nn.utils.rnn as rnn_utils
 
 
-class Net(nn.Module):
+class LSTM(nn.Module):
     def __init__(self, input_size=300,
                  hidden_size=128,
                  num_layers=2,
@@ -12,7 +12,7 @@ class Net(nn.Module):
                  batch_first=True,
                  bidirectional=False,
                  output_size=3):
-        super(Net, self).__init__()
+        super(LSTM, self).__init__()
 
         self.num_layers = num_layers
         self.hidden_size = hidden_size
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     cell_state = torch.randn(num_layers, batch_size, hidden_size)
     hidden = (hidden_state, cell_state)
 
-    model = Net(input_size, hidden_size,
+    model = LSTM(input_size, hidden_size,
                 num_layers,
                 drop_prob,
                 batch_first,

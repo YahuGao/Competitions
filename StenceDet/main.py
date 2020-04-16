@@ -9,7 +9,7 @@ import argparse
 import torch
 from flyai.dataset import Dataset
 from model import Model
-from net import Net
+from net import LSTM
 import numpy as np
 from path import MODEL_PATH
 from data_helper import FlyAIDataSet
@@ -108,7 +108,7 @@ if bidirectional:
     hidden_size *= 2
     num_layers *= 2
 
-net = Net(input_size,
+net = LSTM(input_size,
           hidden_size,
           num_layers,
           drop_prob,
