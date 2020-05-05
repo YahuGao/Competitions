@@ -20,7 +20,11 @@ class LSTM(nn.Module):
                             bidirectional=bidirectional,
                             batch_first=batch_first,
                             dropout=drop_prob)
-        self.fc = nn.Linear(hidden_size, output_size)
+        directional = 1
+        if bidirectional:
+            directional = 2
+
+        self.fc = nn.Linear(hidden_size * directional, output_size)
         self.dropout = nn.Dropout(drop_prob)
 
     def forward(self, input):
@@ -47,12 +51,8 @@ if __name__ == '__main__':
     num_layers = 6
     drop_prob = 0.5
     output_size = 3
-    bidirectional = False
+    bidirectional = True
     batch_first = True
-
-    if bidirectional:
-        hidden_size *= 2
-        num_layers *= 2
 
     batch_size = 5
     seq_len = 4

@@ -101,7 +101,7 @@ hidden_size = 128
 num_layers = 2
 drop_prob = 0.3
 output_size = 3
-bidirectional = False
+bidirectional = True
 batch_first = True
 
 if bidirectional:
