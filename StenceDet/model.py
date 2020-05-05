@@ -4,7 +4,6 @@ import os
 import torch
 from flyai.model.base import Base
 from flyai.dataset import Dataset
-from net import Net
 import torch.nn.utils.rnn as rnn_utils
 
 from path import MODEL_PATH
