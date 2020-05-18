@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=E1101
 """
 Created on Mon Oct 30 19:44:02 2017
 
@@ -7,15 +8,15 @@ Created on Mon Oct 30 19:44:02 2017
 
 import argparse
 import torch
+import torch.nn.utils.rnn as rnn_utils
+import numpy as np
+from flyai.utils.log_helper import train_log
 from flyai.dataset import Dataset
+from sklearn.metrics import accuracy_score
 from model import Model
 from net import LSTM
-import numpy as np
 from path import MODEL_PATH
 from data_helper import FlyAIDataSet
-from flyai.utils.log_helper import train_log
-from sklearn.metrics import accuracy_score
-import torch.nn.utils.rnn as rnn_utils
 
 '''
 样例代码仅供参考学习，可以自己修改实现逻辑。
@@ -31,7 +32,8 @@ Keras模版项目下载： https://www.flyai.com/python/keras_template.zip
 项目的超参
 '''
 parser = argparse.ArgumentParser()
-parser.add_argument("-e", "--EPOCHS", default=10, type=int, help="train epochs")
+parser.add_argument("-e", "--EPOCHS", default=10,
+                    type=int, help="train epochs")
 parser.add_argument("-b", "--BATCH", default=32, type=int, help="batch size")
 args = parser.parse_args()
 
@@ -46,14 +48,16 @@ train_x, train_y, val_x, val_y = dataset.get_all_processor_data()
 train_dataset = FlyAIDataSet(train_x, train_y)
 val_dataset = FlyAIDataSet(val_x, val_y)
 
+
 def collate_fn(data):
-    data.sort(key=lambda x:len(x[0]), reverse=True)
+    data.sort(key=lambda x: len(x[0]), reverse=True)
     inputs, labels = zip(*data)
     inputs_len = [len(item) for item in inputs if len(item) != 0]
     inputs = [torch.Tensor(x) for x in inputs[:len(inputs_len)]]
     inputs = rnn_utils.pad_sequence(inputs, batch_first=True)
     labels = torch.LongTensor(labels[:len(inputs_len)])
     return inputs, inputs_len, labels
+
 
 train_loader = torch.utils.data.DataLoader(train_dataset, shuffle=True,
                                            batch_size=args.BATCH,
@@ -109,12 +113,12 @@ if bidirectional:
     num_layers *= 2
 
 net = LSTM(input_size,
-          hidden_size,
-          num_layers,
-          drop_prob,
-          batch_first,
-          bidirectional,
-          output_size).to(device)
+           hidden_size,
+           num_layers,
+           drop_prob,
+           batch_first,
+           bidirectional,
+           output_size).to(device)
 
 lrs = [0.0005, 0.0004, 0.0003, 0.0002, 0.0001]
 best_lr = 0
@@ -132,6 +136,7 @@ dataset.get_step() 获取数据的总迭代次数
 实现自己的模型保存逻辑
 '''
 
+
 def get_weights_and_bias(model):
     weights, bias = [], []
     for name, p in model.named_parameters():
@@ -140,6 +145,7 @@ def get_weights_and_bias(model):
         else:
             weights += [p]
     return weights, bias
+
 
 for lr in lrs:
     for clip in clips:
@@ -205,11 +211,13 @@ for lr in lrs:
                             best_weight_decay = weight_decay
                             valid_loss_min = np.mean(val_losses)
 
+                '''
                 if pre_valid_loss_min > valid_loss_min:
                     pre_valid_loss_min = valid_loss_min
                 else:
                     print("early stop")
                     break
+                '''
 
 model.save_model(net, MODEL_PATH, overwrite=False)
 print("best_lr: ", best_lr)
