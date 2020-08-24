@@ -6,3 +6,4 @@ data/
 errors.log
 pytorch_template.zip
 tags
+*/.ipynb_checkpoints/*
