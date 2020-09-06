@@ -216,3 +216,10 @@ class DataGeneratorHAN(keras.utils.Sequence):
 
             return x, y, sample_weights
         return x
+
+
+def do_predict(model, test_generator, result_name):
+    result = model.predict(test_generator)
+    result = result.argmax(result, axis=1)
+    result = pd.DataFrame({'label': result})
+    result.to_csv(filename, index=False)
