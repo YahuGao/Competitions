@@ -34,6 +34,7 @@ def read_data(train_data='./data/train_set.csv', test_data='./data/test_a.csv'):
         df_test = pd.read_csv(test_data, encoding='utf-8', sep='\t')
 
     df_train['text_len'] = df_train['text'].apply(lambda x: len(x.split(' ')))
+    df_train = df_train.loc[df_train['text_len']>10]
     df_test['text_len'] = df_test['text'].apply(lambda x: len(x.split(' ')))
 
     return df_train, df_test
