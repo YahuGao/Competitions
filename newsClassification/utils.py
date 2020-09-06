@@ -1,13 +1,53 @@
 import os
+import socket
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.preprocessing import sequence
 from sklearn.utils.class_weight import compute_sample_weight
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.python.client import device_lib
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
+
+
+'''
+read_data(): read data from csv file
+split_train_val(df_train):
+check_device():
+assign_gpu()
+F1_score(): class
+DataGenerator()
+DataGeneratorHAN()
+'''
+
+def read_data():
+    hostname = socket.gethostname()
+    if hostname == 'yahu-ThinkPad-X1C7':
+        df_train = pd.read_csv('data/train_set.csv', encoding='utf-8', sep='\t', nrows=500)
+        df_test = pd.read_csv('data/test_a.csv', encoding='utf-8', sep='\t', nrows=100)
+    else:
+        df_train = pd.read_csv('data/train_set.csv', encoding='utf-8', sep='\t')
+        df_test = pd.read_csv('data/test_a.csv', encoding='utf-8', sep='\t')
+
+    df['text_len'] = df['text'].apply(lambda x: len(x.split(' ')))
+    df_test['text_len'] = df_test['text'].apply(lambda x: len(x.split(' ')))
+
+    return df_train, df_test
+
+
+def split_train_val(df_train, test_size=0.3, random_state=1):
+    x_train = df['text'].values.tolist()
+    y_train = df['label'].values.tolist()
+    x_test = df_test['text'].values.tolist()
+
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                      y_train,
+                                                      test_size=0.3,
+                                                      random_state=1)
+
+    return x_train, x_val, y_train, y_val
 
 
 def check_device():
