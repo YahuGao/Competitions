@@ -219,8 +219,7 @@ class DataGeneratorHAN(keras.utils.Sequence):
         return x
 
 
-def do_predict(model, test_generator, result_name):
+def do_predict(model, test_generator, result_file):
     result = model.predict(test_generator)
-    result = result.argmax(result, axis=1)
-    result = pd.DataFrame({'label': result})
-    result.to_csv(filename, index=False)
+    labels = np.argmax(result, axis=1)
+    np.savetxt(result_file, labels, header='label', fmt=['%d'], comments='')
