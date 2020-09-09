@@ -39,7 +39,32 @@ model = Model(dataset)
 '''
 实现自己的网络机构
 '''
-seque = Sequential()
+from tensorflow.keras import Input, Model
+from tensorflow.keras.layers import Embedding, Dense, Conv1D, GlobalMaxPooling1D, Concatenate, Dropout
+import numpy as np
+
+class ELMoTextClassifier(object):
+    def __init__(self, maxlen, max_features, embedding_dims,
+                 class_num=5,
+                 last_activation='softmax'):
+        self.maxlen = maxlen
+        self.max_features = max_features
+        self.embedding_dims = embedding_dims
+        self.class_num = class_num
+        self.last_activation = last_activation
+
+    def get_model(self):
+        embedding = Input((self.maxlen, self.embedding_dims,))
+        convs = []
+        for kernel_size in [3, 4, 5]:
+            c = Conv1D(128, kernel_size, activation='relu')(embedding)
+            c = GlobalMaxPooling1D()(c)
+            convs.append(c)
+        x = Concatenate()(convs)
+
+        output = Dense(self.class_num, activation=self.last_activation)(x)
+        model = Model(inputs=embedding, outputs=output)
+        return model
 
 '''
 dataset.get_step() 获取数据的总迭代次数
