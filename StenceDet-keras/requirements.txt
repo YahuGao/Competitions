@@ -1,0 +1,8 @@
+flyai
+numpy
+opencv-python
+matplotlib
+scipy
+Pillow
+tensorflow
+keras
