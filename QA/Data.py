@@ -124,34 +124,3 @@ if __name__ == '__main__':
     filename = 'train_questions.csv'
     data = Data(filename, stoplist_name)
     data.get_dataset()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
