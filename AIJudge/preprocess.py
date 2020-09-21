@@ -2,7 +2,9 @@ import jieba
 import jieba.analyse
 import jieba.posseg
 import pandas as pd
+from pandarallel import pandarallel
 
+pandarallel.initialize(progress_bar=True)
 
 def get_stopwords(path='./data/stop_words.txt'):
     '''
@@ -32,8 +34,8 @@ def load_data(train='./data/train.csv', test='./data/test.csv', nrows=None):
     df_tr = pd.read_csv(train, sep='\t', nrows=nrows).fillna(0)
     df_te = pd.read_csv(test, sep='\t', nrows=nrows).fillna(0)
 
-    df_tr['text'] = df_tr['text'].apply(split_word)
-    df_te['text'] = df_te['text'].apply(split_word)
+    df_tr['text'] = df_tr['text'].parallel_apply(split_word)
+    df_te['text'] = df_te['text'].parallel_apply(split_word)
     return df_tr, df_te
 
 
